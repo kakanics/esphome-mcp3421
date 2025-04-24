@@ -1,35 +1,25 @@
-// custom_components/mcp3421/mcp3421.cpp
-
+#include "esphome.h"
 #include "mcp3421.h"
-#include "esphome/core/log.h"
 
 namespace esphome {
 namespace mcp3421 {
 
-static const char *const TAG = "mcp3421.sensor";
+// Register the MCP3421 platform
+static const char *const TAG = "mcp3421";
 
-void MCP3421Sensor::setup() {
-  ESP_LOGCONFIG(TAG, "Setting up MCP3421 sensor...");
+// This function initializes the sensor
+void MCP3421::setup() {
+  ESP_LOGD(TAG, "Setting up MCP3421 pH Sensor");
+  // Perform any setup for the sensor here (e.g., I2C setup, GPIO configuration)
 }
 
-void MCP3421Sensor::update() {
-  uint8_t buffer[3];
-
-  if (!this->read(buffer, 3)) {
-    ESP_LOGW(TAG, "Failed to read data from MCP3421");
-    return;
-  }
-
-  int32_t value = ((int32_t)buffer[0] << 16) | ((int32_t)buffer[1] << 8) | buffer[2];
-  value >>= 4;  // 18-bit resolution is in upper 18 bits
-
-  float voltage = (value * 2.048) / 131072.0;  // 2.048V ref, 18-bit gain=1
-  ESP_LOGD(TAG, "MCP3421 Raw: %d -> Voltage: %.5f V", value, voltage);
-
-  if (sensor_ != nullptr)
-    sensor_->publish_state(voltage);
+// This function is responsible for updating the sensor value
+void MCP3421::update() {
+  ESP_LOGD(TAG, "Updating MCP3421 pH Sensor");
+  // Read the sensor value (you'll need to implement this logic)
+  float ph_value = read_ph_value();
+  this->publish_state(ph_value);
 }
 
 }  // namespace mcp3421
 }  // namespace esphome
-
