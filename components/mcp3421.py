@@ -1,18 +1,22 @@
-from esphome import core
+import esphome.codegen as cg
+import esphome.config_validation as cv
 from esphome.components import sensor
-from esphome.const import CONF_ID, CONF_UPDATE_INTERVAL
+from esphome.const import CONF_ID, UNIT_VOLT, ICON_FLASH, DEVICE_CLASS_VOLTAGE
 
-# Define the MCP3421 sensor class
-class MCP3421Sensor(sensor.Sensor):
-    def __init__(self, id):
-        super().__init__(id)
-        self.update_interval = 10  # Update interval in seconds (adjust as needed)
+CODEOWNERS = ["@your-github"]
 
-    def setup(self):
-        # Setup the sensor (e.g., initialize I2C, hardware setup)
-        pass
+mcp3421_ns = cg.esphome_ns.namespace("mcp3421")
+MCP3421Sensor = mcp3421_ns.class_("MCP3421Sensor", sensor.Sensor, cg.Component)
 
-    def update(self):
-        # This method will be called to update the sensor value
-        # You need to implement the logic to fetch the actual sensor reading here
-        self.publish_state(7.0)  # Example: returns a fixed pH value (replace with real sensor data)
+CONFIG_SCHEMA = sensor.sensor_schema(
+    unit_of_measurement=UNIT_VOLT,
+    icon=ICON_FLASH,
+    accuracy_decimals=3
+).extend({
+    cv.GenerateID(): cv.declare_id(MCP3421Sensor),
+})
+
+def to_code(config):
+    var = cg.new_Pvariable(config[CONF_ID])
+    yield cg.register_component(var, config)
+    yield sensor.register_sensor(var, config)
