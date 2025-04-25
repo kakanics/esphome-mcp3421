@@ -7,7 +7,8 @@
 namespace esphome{
 namespace mcp3421{
   
-class MCP3421Sensor : public sensor::Sensor{  // Inheriting from sensor::Sensor
+  class MCP3421Sensor : public PollingComponent, public sensor::Sensor {
+    // Inheriting from sensor::Sensor
  public:
  MCP3421Sensor() {}
 
