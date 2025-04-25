@@ -5,6 +5,7 @@
 #include <esphome/components/sensor/sensor.h> // Ensure this header is included
 
 // Define the MCP3421 class
+namespace esphome::mcp3421{
 class MCP3421 : public sensor::Sensor {  // Inheriting from sensor::Sensor
  public:
   MCP3421() {}
@@ -28,5 +29,5 @@ class MCP3421 : public sensor::Sensor {  // Inheriting from sensor::Sensor
  protected:
   // Add any required member variables here (e.g., I2C interface, sensor address)
 };
-
+}
 #endif  // MCP3421_H
