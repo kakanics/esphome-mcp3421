@@ -2,13 +2,13 @@
 
 #include "esphome/core/component.h"
 #include "esphome/components/sensor/sensor.h"
+#include "esphome/components/i2c/i2c.h"
 
 // Define the MCP3421 class
 namespace esphome{
 namespace mcp3421{
   
-  class MCP3421Sensor : public PollingComponent, public sensor::Sensor {
-    // Inheriting from sensor::Sensor
+  class MCP3421Sensor : public PollingComponent, public sensor::Sensor, public i2c::I2CDevice{
  public:
  MCP3421Sensor() {}
 
