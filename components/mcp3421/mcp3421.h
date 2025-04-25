@@ -1,8 +1,8 @@
 #ifndef MCP3421_H
 #define MCP3421_H
 
-#include "esphome/core/component.h"
-#include "esphome/components/sensor/sensor.h"  // Ensure this header is included
+#include <esphome/core/component.h>
+#include <esphome/components/sensor/sensor.h> // Ensure this header is included
 
 // Define the MCP3421 class
 class MCP3421 : public sensor::Sensor {  // Inheriting from sensor::Sensor
