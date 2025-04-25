@@ -2,27 +2,25 @@
 #define MCP3421_H
 
 #include "esphome/core/component.h"
-#include "esphome/components/sensor/sensor.h"
+#include "esphome/components/sensor/sensor.h"  // Ensure this header is included
 
 // Define the MCP3421 class
-class MCP3421 : public sensor::Sensor {
+class MCP3421 : public sensor::Sensor {  // Inheriting from sensor::Sensor
  public:
   MCP3421() {}
 
-  void setup() override {
+  void setup() override {  // Defining setup inside the class
     // Initialize the MCP3421 sensor (e.g., setup I2C, GPIOs)
   }
 
-  void update() override {
+  void update() override {  // Defining update inside the class
     // Read the sensor data and publish the values
-    // Example: sensor value reading
     float ph_value = this->read_ph_value();
     this->publish_state(ph_value);
   }
 
-  float read_ph_value() {
+  float read_ph_value() {  // Correct placement of read_ph_value()
     // Add the logic to read the pH value from the sensor
-    // This is just an example logic, adjust based on your actual sensor's protocol
     float ph = 7.0;  // Replace with actual reading logic
     return ph;
   }
