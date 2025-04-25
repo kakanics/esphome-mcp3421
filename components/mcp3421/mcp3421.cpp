@@ -1,45 +1,22 @@
-#include <esphome/core/log.h>
+#include "esphome.h"
 #include "mcp3421.h"
-#include "power_guard.h"
 
-namespace esphome::mcp3421 {
+using namespace esphome;
+using namespace mcp3421;
+// Register the MCP3421 platform
+static const char *const TAG = "mcp3421";
 
-using ::std::size_t;
-
-static const char *TAG = "mcp3421.sensor";
-
-void Mcp3421Sensor::setup() {
-    if (continuous_) {
-        uint8_t config = 0x90 | this->width_ | this->gain_;
-        I2CDevice::write(&config, sizeof(config));
-    }
+// This function initializes the sensor
+void MCP3421::setup() {
+  ESP_LOGD(TAG, "Setting up MCP3421 pH Sensor");
+  // Perform any setup for the sensor here (e.g., I2C setup, GPIO configuration)
 }
 
-void Mcp3421Sensor::update() {
-#ifdef USE_POWER_SUPPLY
-    PowerGuard guard{power_};
-#endif
-    uint8_t data[4];
-    size_t length = (this->width_ == 0xc) ? 4 : 3;
-
-    if (!continuous_) {
-        uint8_t config = 0x80 | this->width_ | this->gain_;
-        I2CDevice::write(&config, sizeof(config));
-    }
-
-    do {
-        I2CDevice::read(data, length);
-    } while (data[length-1] & 0x80);
-
-    float value = static_cast<float>((this->width_ == 0x0c)
-        ? ((data[0] << 16) | (data[1] << 8) | data[2])
-        : ((data[0] << 8) | data[1])
-    );
-    this->publish_state(value / this->max_);
+// This function is responsible for updating the sensor value
+void MCP3421::update() {
+  ESP_LOGD(TAG, "Updating MCP3421 pH Sensor");
+  // Read the sensor value (you'll need to implement this logic)
+  float ph_value = read_ph_value();
+  this->publish_state(ph_value);
 }
 
-void Mcp3421Sensor::dump_config() {
-    LOG_I2C_DEVICE(this);
-}
-
-} /* namespace esphome::mcp3421 */

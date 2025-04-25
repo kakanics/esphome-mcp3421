@@ -1,48 +1,32 @@
-#ifndef _MCP3421_H_
-#define _MCP3421_H_
+#pragma once
 
-#include <esphome/core/component.h>
-#include <esphome/components/sensor/sensor.h>
-#include <esphome/components/i2c/i2c.h>
-#ifdef USE_POWER_SUPPLY
-#include "esphome/components/power_supply/power_supply.h"
-#endif
+#include "esphome/core/component.h"
+#include "esphome/components/sensor/sensor.h"
 
-namespace esphome::mcp3421 {
+// Define the MCP3421 class
+using namespace esphome;
+using namespace mcp3421;
 
-class Mcp3421Sensor : public sensor::Sensor, public PollingComponent, public i2c::I2CDevice
-{
-public:
-    Mcp3421Sensor(bool continuous, uint8_t width, uint8_t gain)
-        : continuous_(continuous), width_(width), gain_(gain), max_(calc_max(width))
-    {}
+class MCP3421 : public sensor::Sensor {  // Inheriting from sensor::Sensor
+ public:
+  MCP3421() {}
 
-    void setup() override;
-    void update() override;
-    void dump_config() override;
+  void setup() override {  // Defining setup inside the class
+    // Initialize the MCP3421 sensor (e.g., setup I2C, GPIOs)
+  }
 
-#ifdef USE_POWER_SUPPLY
-    void set_power_supply(power_supply::PowerSupply *power_supply) { this->power_.set_parent(power_supply); }
-#endif
+  void update() override {  // Defining update inside the class
+    // Read the sensor data and publish the values
+    float ph_value = this->read_ph_value();
+    this->publish_state(ph_value);
+  }
 
-protected:
-#ifdef USE_POWER_SUPPLY
-    power_supply::PowerSupplyRequester power_;
-#endif
+  float read_ph_value() {  // Correct placement of read_ph_value()
+    // Add the logic to read the pH value from the sensor
+    float ph = 7.0;  // Replace with actual reading logic
+    return ph;
+  }
 
-    const bool continuous_;
-    const uint8_t width_;
-    const uint8_t gain_;
-    const float max_;
-
-    float calc_max(uint8_t width) const
-    {
-        int tmp = 10 + (this->width_ >> 1);
-        return static_cast<float>(1 << tmp);
-    }
+ protected:
+  // Add any required member variables here (e.g., I2C interface, sensor address)
 };
-
-}
-
-
-#endif /*_MCP3421_H_*/
