@@ -1,9 +1,8 @@
 #include "esphome.h"
 #include "mcp3421.h"
 
-namespace esphome {
-namespace mcp3421 {
-
+using namespace esphome;
+using namespace mcp3421;
 // Register the MCP3421 platform
 static const char *const TAG = "mcp3421";
 
@@ -21,5 +20,3 @@ void MCP3421::update() {
   this->publish_state(ph_value);
 }
 
-}  // namespace mcp3421
-}  // namespace esphome
