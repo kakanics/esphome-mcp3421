@@ -1,8 +1,8 @@
 #include "esphome.h"
 #include "mcp3421.h"
 
-using namespace esphome{
-using namespace mcp3421{
+namespace esphome{
+namespace mcp3421{
 // Register the MCP3421 platform
 static const char *const TAG = "mcp3421";
 

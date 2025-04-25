@@ -4,9 +4,8 @@
 #include "esphome/components/sensor/sensor.h"
 
 // Define the MCP3421 class
-using namespace esphome{
-
-  using namespace mcp3421{
+namespace esphome{
+namespace mcp3421{
   
 class MCP3421Sensor : public sensor::Sensor, public PollingComponent {  // Inheriting from sensor::Sensor
  public:
