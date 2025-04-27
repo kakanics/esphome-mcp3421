@@ -1,48 +1,44 @@
-#ifndef _MCP3421_H_
-#define _MCP3421_H_
-
-#include <esphome/core/component.h>
-#include <esphome/components/sensor/sensor.h>
-#include <esphome/components/i2c/i2c.h>
-#ifdef USE_POWER_SUPPLY
-#include "esphome/components/power_supply/power_supply.h"
-#endif
+#include <esphome/core/log.h>
+#include "mcp3421.h"
 
 namespace esphome::mcp3421 {
 
-class Mcp3421Sensor : public sensor::Sensor, public PollingComponent, public i2c::I2CDevice
-{
-public:
-    Mcp3421Sensor(bool continuous, uint8_t width, uint8_t gain)
-        : continuous_(continuous), width_(width), gain_(gain), max_(calc_max(width))
-    {}
+using ::std::size_t;
 
-    void setup() override;
-    void update() override;
-    void dump_config() override;
+static const char *TAG = "mcp3421.sensor";
 
-#ifdef USE_POWER_SUPPLY
-    void set_power_supply(power_supply::PowerSupply *power_supply) { this->power_.set_parent(power_supply); }
-#endif
-
-protected:
-#ifdef USE_POWER_SUPPLY
-    power_supply::PowerSupplyRequester power_;
-#endif
-
-    const bool continuous_;
-    const uint8_t width_;
-    const uint8_t gain_;
-    const float max_;
-
-    float calc_max(uint8_t width) const
-    {
-        int tmp = 10 + (this->width_ >> 1);
-        return static_cast<float>(1 << tmp);
+void Mcp3421Sensor::setup() {
+    if (continuous_) {
+        uint8_t config = 0x90 | this->width_ | this->gain_;
+        I2CDevice::write(&config, sizeof(config));
     }
-};
-
 }
 
+void Mcp3421Sensor::update() {
+#ifdef USE_POWER_SUPPLY
+    PowerGuard guard{power_};
+#endif
+    uint8_t data[4];
+    size_t length = (this->width_ == 0xc) ? 4 : 3;
 
-#endif /*_MCP3421_H_*/
+    if (!continuous_) {
+        uint8_t config = 0x80 | this->width_ | this->gain_;
+        I2CDevice::write(&config, sizeof(config));
+    }
+
+    do {
+        I2CDevice::read(data, length);
+    } while (data[length-1] & 0x80);
+
+    float value = static_cast<float>((this->width_ == 0x0c)
+        ? ((data[0] << 16) | (data[1] << 8) | data[2])
+        : ((data[0] << 8) | data[1])
+    );
+    this->publish_state(value / this->max_);
+}
+
+void Mcp3421Sensor::dump_config() {
+    LOG_I2C_DEVICE(this);
+}
+
+} /* namespace esphome::mcp3421 */
