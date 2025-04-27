@@ -1,29 +1,45 @@
-#pragma once
+#ifndef _MCP3421_H_
+#define _MCP3421_H_
 
-#include "esphome/core/component.h"
-#include "esphome/components/sensor/sensor.h"
-#include "esphome/components/i2c/i2c.h"
+#include <esphome/core/component.h>
+#include <esphome/components/sensor/sensor.h>
+#include <esphome/components/i2c/i2c.h>
 
-// Define the MCP3421 class
-namespace esphome{
-namespace mcp3421{
-  
-  class MCP3421Sensor : public PollingComponent, public sensor::Sensor, public i2c::I2CDevice{
- public:
- MCP3421Sensor() {}
+namespace esphome::mcp3421 {
 
- void setup();
+class Mcp3421Sensor : public sensor::Sensor, public PollingComponent, public i2c::I2CDevice
+{
+public:
+    Mcp3421Sensor(bool continuous, uint8_t width, uint8_t gain)
+        : continuous_(continuous), width_(width), gain_(gain), max_(calc_max(width))
+    {}
 
-  void update();
+    void setup() override;
+    void update() override;
+    void dump_config() override;
 
-  float read_ph_value() {  // Correct placement of read_ph_value()
-    // Add the logic to read the pH value from the sensor
-    float ph = 7.0;  // Replace with actual reading logic
-    return ph;
-  }
+#ifdef USE_POWER_SUPPLY
+    void set_power_supply(power_supply::PowerSupply *power_supply) { this->power_.set_parent(power_supply); }
+#endif
 
- protected:
- // Add any required member variables here (e.g., I2C interface, sensor address)
+protected:
+#ifdef USE_POWER_SUPPLY
+    power_supply::PowerSupplyRequester power_;
+#endif
+
+    const bool continuous_;
+    const uint8_t width_;
+    const uint8_t gain_;
+    const float max_;
+
+    float calc_max(uint8_t width) const
+    {
+        int tmp = 10 + (this->width_ >> 1);
+        return static_cast<float>(1 << tmp);
+    }
 };
+
 }
-}
+
+
+#endif /*_MCP3421_H_*/
