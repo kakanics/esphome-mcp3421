@@ -1,24 +1,48 @@
-#include "esphome.h"
-#include "mcp3421.h"
+#ifndef _MCP3421_H_
+#define _MCP3421_H_
 
-namespace esphome{
-namespace mcp3421{
-// Register the MCP3421 platform
-static const char *const TAG = "mcp3421";
+#include <esphome/core/component.h>
+#include <esphome/components/sensor/sensor.h>
+#include <esphome/components/i2c/i2c.h>
+#ifdef USE_POWER_SUPPLY
+#include "esphome/components/power_supply/power_supply.h"
+#endif
 
-// This function initializes the sensor
-void MCP3421Sensor::setup() {
-  ESP_LOGD(TAG, "Setting up MCP3421 pH Sensor");
-  // Perform any setup for the sensor here (e.g., I2C setup, GPIO configuration)
+namespace esphome::mcp3421 {
+
+class Mcp3421Sensor : public sensor::Sensor, public PollingComponent, public i2c::I2CDevice
+{
+public:
+    Mcp3421Sensor(bool continuous, uint8_t width, uint8_t gain)
+        : continuous_(continuous), width_(width), gain_(gain), max_(calc_max(width))
+    {}
+
+    void setup() override;
+    void update() override;
+    void dump_config() override;
+
+#ifdef USE_POWER_SUPPLY
+    void set_power_supply(power_supply::PowerSupply *power_supply) { this->power_.set_parent(power_supply); }
+#endif
+
+protected:
+#ifdef USE_POWER_SUPPLY
+    power_supply::PowerSupplyRequester power_;
+#endif
+
+    const bool continuous_;
+    const uint8_t width_;
+    const uint8_t gain_;
+    const float max_;
+
+    float calc_max(uint8_t width) const
+    {
+        int tmp = 10 + (this->width_ >> 1);
+        return static_cast<float>(1 << tmp);
+    }
+};
+
 }
 
-// This function is responsible for updating the sensor value
-void MCP3421Sensor::update() {
-  ESP_LOGD(TAG, "Updating MCP3421 pH Sensor");
-  // Read the sensor value (you'll need to implement this logic)
-  float ph_value = read_ph_value();
-  this->publish_state(ph_value);
-}
-}
-}
 
+#endif /*_MCP3421_H_*/
