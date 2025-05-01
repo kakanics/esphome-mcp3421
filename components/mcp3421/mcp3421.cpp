@@ -34,7 +34,8 @@ void Mcp3421Sensor::update() {
         ? ((data[0] << 16) | (data[1] << 8) | data[2])
         : ((data[0] << 8) | data[1])
     );
-    this->publish_state(value / this->max_);
+    ESP_LOGD(TAG, "Raw value: 0x%02X%02X%02X", data[0], data[1], (this->width_ == 0x0c) ? data[2] : 0);
+    this->publish_state(value);
 }
 
 void Mcp3421Sensor::dump_config() {
