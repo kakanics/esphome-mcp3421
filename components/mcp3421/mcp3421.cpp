@@ -30,6 +30,7 @@ void Mcp3421Sensor::update() {
         I2CDevice::read(data, length);
     } while (data[length-1] & 0x80);
 
+    data[0] = data[0] & 0x0F;
     float value = static_cast<float>((this->width_ == 0x0c)
         ? ((data[0] << 16) | (data[1] << 8) | data[2])
         : ((data[0] << 8) | data[1])
