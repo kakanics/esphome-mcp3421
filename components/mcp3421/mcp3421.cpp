@@ -35,7 +35,7 @@ void Mcp3421Sensor::update() {
         : ((data[0] << 8) | data[1])
     );
     ESP_LOGD(TAG, "Raw bytes: 0x%02X%02X%02X", data[0], data[1], (this->width_ == 0x0c) ? data[2] : 0);
-    ESP_LOGD(TAG, "Calculated value: %f/%f", value, max_);
+    ESP_LOGD(TAG, "Calculated value: %f", value);
     float result = 7.0 - static_cast<float>(value) / 59.17;
     this->publish_state(result);
 }
